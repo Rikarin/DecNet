@@ -14,37 +14,61 @@ alias PrivateKeyException = Exception;
 
 
 class PrivateKey {
-    private BigInt m_data;
+    enum PIFLength = 51;
 
+    private BigInt m_data;
 
     // Creates new private key
     this() /*immutable*/ {
-        m_data = uniform(1, 0xFF);
+        m_data = uniform(0x10, 0xFF);
 
         // TODO: remove pseudo-random generation
-        foreach (i; 0 .. 62) {
+        foreach (i; 0 .. 31) {
             m_data <<= 8;
             m_data += uniform(0, 0xFF);
         }
 
-        writeln("new: ", m_data);
+        //writeln("gen: ", m_data);
     }
 
-    this(string hash) {
-        m_data = "0x" ~ hash;
-
-        writeln("this: ", m_data);
+    this(string hex) {
+        m_data = BigInt("0x" ~ hex);
+        //writeln("opn: ", m_data);
     }
 
 
 
     // === Validation
-    bool isValid() const nothrow {
-        assert(false, "TODO");
+    static bool isValid(string pif) nothrow {
+        try {
+            if (pif.length != PIFLength) {
+                return false;
+            }
+
+            auto tmp = parsePIF(pif);
+            auto crc = tmp.key.sha256Of().sha256Of();
+
+            if (crc == tmp.crc) {
+                return true;
+            }
+
+            return false;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
-    void validate() const {
-        throw new PrivateKeyException("Key is not valid!");
+    static void validate(string pif) {
+        if (pif.length != PIFLength) {
+            throw new PrivateKeyException("Length doesn't match");
+        }
+
+        auto tmp = parsePIF(pif);
+        auto crc = tmp.key.sha256Of().sha256Of();
+
+        if (crc != tmp.crc) {
+            throw new PrivateKeyException("CRC mismatch");
+        }
     }
 
 
@@ -62,7 +86,7 @@ class PrivateKey {
 
     // === PIF serialization/deserialization
     string toPIF() const {
-        auto key = [ubyte(0x42)] ~ m_data.toArray();
+        auto key = [ubyte(Networks.Live)] ~ m_data.toArray();
         auto crc = key.sha256Of().sha256Of();
         key     ~= crc[0 .. 4];
 
@@ -70,16 +94,22 @@ class PrivateKey {
     }
 
     static PrivateKey fromPIF(string pif) {
-        auto key = Base58.decode(pif);
-        auto crc = key[$ - 4 .. $];
-        // TODO, type??
-        key      = key[1 .. $ - 4];
+        return new PrivateKey(parsePIF(pif).key.toHexString());
+    }
 
+    private static auto parsePIF(string pif) {
+        auto key  = Base58.decode(pif);
+        auto crc  = key[$ - 4 .. $];
+        auto type = cast(Networks)key[0];
+        key       = key[1 .. $ - 4];
 
-        writeln(" hash: ", key.toHexString());
-        auto ret = new PrivateKey(key.toHexString());
+        static struct ParsedPIF {
+            ubyte[]  key;
+            ubyte[]  crc;
+            Networks type;
+        }
 
-        assert(false, "TODO");
+        return ParsedPIF(key, crc, type);
     }
 }
 

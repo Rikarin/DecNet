@@ -2,9 +2,8 @@ module network;
 
 
 enum Networks : ubyte {
-    TestNet,
-
-    Live = 0xFF
+    TestNet = 0x18,
+    Live    = 0x42
 }
 
 

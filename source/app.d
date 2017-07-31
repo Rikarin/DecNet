@@ -18,9 +18,12 @@ void user1() {
 
 
     auto str = privateKey.toPIF();
+    writeln("len: ", str.length);
     writeln("test: ", str);
 
 
-    PrivateKey.fromPIF(str);
+    if (PrivateKey.isValid(str)) {
+        PrivateKey.fromPIF(str);
+    }
 
 }

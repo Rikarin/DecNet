@@ -4,6 +4,7 @@ import std.conv;
 
 
 class Base58 {
+@safe:
     private static immutable Alphabet = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
     private static int[] Indexes      = new int[128];
 
