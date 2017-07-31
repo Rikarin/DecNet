@@ -18,7 +18,7 @@ class Base58 {
         }
     }
 
-    static string encode(ubyte[] buffer) {
+    static string encode(const(ubyte)[] buffer) {
         if (!buffer.length) {
             return "";
         }

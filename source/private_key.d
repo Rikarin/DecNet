@@ -1,6 +1,5 @@
 module private_key;
 
-import address;
 import network;
 import public_key;
 import crypto.base58;
@@ -16,7 +15,7 @@ alias PrivateKeyException = Exception;
 class PrivateKey {
     enum PIFLength = 51;
 
-    private BigInt m_data;
+    private BigInt m_data; // TODO
 
     // Creates new private key
     this() /*immutable*/ {
@@ -27,15 +26,11 @@ class PrivateKey {
             m_data <<= 8;
             m_data += uniform(0, 0xFF);
         }
-
-        //writeln("gen: ", m_data);
     }
 
     this(string hex) {
         m_data = BigInt("0x" ~ hex);
-        //writeln("opn: ", m_data);
     }
-
 
 
     // === Validation
@@ -72,16 +67,11 @@ class PrivateKey {
     }
 
 
-
     // === Conversion
     PublicKey toPublicKey() const { // TODO retun immutable PK?
-        return new PublicKey(); // TODO
+        // TODO: convert to hex public and call ctor
+        return new PublicKey(m_data.toHex()); // FIX: this is shit
     }
-
-    Address toAddress(Networks networks = Networks.Live) const {
-        return new Address(toPublicKey());
-    }
-
 
 
     // === PIF serialization/deserialization
@@ -113,4 +103,3 @@ class PrivateKey {
     }
 }
 
-import std.stdio;
