@@ -1,0 +1,7 @@
+module address;
+
+
+class Address {
+
+}
+

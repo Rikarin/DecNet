@@ -1,3 +1,5 @@
+module server;
+
 import peer;
 import packet;
 
