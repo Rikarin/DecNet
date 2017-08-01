@@ -44,11 +44,11 @@ class Packet {
 
 
 T* payload(T, U)(U* data) {
-    return cast(T *)(cast(ubyte)data + U.sizeof);
+    return cast(T *)(cast(ulong)data + U.sizeof);
 }
 
 ubyte[] payload(U)(U* data) {
-    return (cast(ubyte *)(cast(ubyte)data + U.sizeof))[0 .. data.length];
+    return (cast(ubyte *)(cast(ulong)data + U.sizeof))[0 .. data.length];
 }
 
 bool crcCheck(T)(T* data) {
