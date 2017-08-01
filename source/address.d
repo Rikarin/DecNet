@@ -11,6 +11,10 @@ import std.digest.ripemd : ripemd160Of;
 class Address {
     private ubyte[25] m_data; // 1 + 20 + 4
 
+    private this() {
+
+    }
+
     this(const PublicKey key, Networks networks) {
         auto hash = ripemd160Of(sha256Of(key.toString()));
         auto crc  = sha256Of(sha256Of(m_data[1 .. $ - 4]));
@@ -38,11 +42,14 @@ class Address {
 
 
     static Address fromString(string address) {
-        assert(false, "TODO");
+        auto ret   = new Address;
+        ret.m_data = Base58.decode(address);
+
+        return ret;
     }
 
-    static Address fromPublicKey(string address) {
-        assert(false, "TODO");
+    static Address fromPublicKey(string key) {
+        return new Address(new PublicKey(key), Networks.Live);
     }
 }
 
