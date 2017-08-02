@@ -47,7 +47,7 @@ class Pool {
 
         foreach (x; m_listener) {
             // TODO: this shit is not supported yet
-            // TODO: x.stopListening();
+            x.stopListening();
         }
     }
 
@@ -59,7 +59,7 @@ class Pool {
 
     private void _listen(TCPConnection sock) {
         m_peers ~= new Peer(sock, m_nets);
-        logInfo("accepted connection");
+        logInfo("accepted connection %s", sock.peerAddress);
     }
 
     private void _peersChecker() {

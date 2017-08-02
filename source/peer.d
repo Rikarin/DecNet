@@ -103,6 +103,8 @@ class Peer {
 
                 m_socket.read(data);
                 msg.appendData(data);
+
+                parseMessage(this, msg);
             } catch (Exception e) {
                 m_state = PeerState.Disconnected;
                 logError("Disconnected");

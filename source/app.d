@@ -14,9 +14,12 @@ import std.datetime;
 import core.thread;
 
 import vibe.core.core;
+import vibe.core.task;
 
 // TODO: -D path/to/dir/with/private_key + cache for my profile
 // TODO: -p listening port, default 4295
+
+Pool pol;
 
 shared static this() {
     runTask({
@@ -25,10 +28,10 @@ shared static this() {
         writeln("Welcome to the DecNet!");
         writeln("Working directory: ", dir);
 
-        auto pool = new Pool(Networks.Live);
-        pool.connect();
-        pool.listen();
-        Thread.sleep(1.seconds);
+        pol = new Pool(Networks.Live);
+        pol.connect();
+        pol.listen();
+        sleep(1.seconds);
 
         user1();
 
@@ -42,9 +45,9 @@ shared static this() {
 
         */
 
-        Thread.sleep(5.seconds);
+        sleep(5.seconds);
         writeln("exiting...");
-        pool.disconnect();
+        //pool.disconnect();
     });
 }
 
@@ -67,10 +70,10 @@ void user1() {
     */
 
     per = new Peer("127.0.0.1", 4295, Networks.Live);
-    Thread.sleep(1.seconds);
+    sleep(1.seconds);
     per.connect();
 
-    Thread.sleep(1.seconds);
+    sleep(1.seconds);
     //peer.disconnect();
 }
 

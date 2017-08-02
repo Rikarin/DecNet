@@ -29,8 +29,8 @@ class Message {
     }
 
 
-    string command() const {
-        return m_header.command.idup;
+    const(char)[12] command() const {
+        return m_header.command;
     }
 
     int length() const {
@@ -139,12 +139,35 @@ private enum char[Message.Header.command.sizeof][Command] ms_cmdTable = [
 
 
 // TODO: move this to another file?
+// TODO: use dynamic array/
+alias ParseCallback = void function(Peer, Message);
+private enum ParseCallback[char[12]] ms_parseCallbacks = [
+    ms_cmdTable[Command.Version] : &handleVersion,
+    ms_cmdTable[Command.VerAck]  : &handleVerAck,
+];
+
+
+void parseMessage(Peer peer, Message msg) {
+    logInfo("parsing command %s", msg.command);
+
+    if (auto x = msg.command in ms_parseCallbacks) {
+        (*x)(peer, msg);
+    } else {
+        logWarn("unknown command!");
+    }
+}
+
 
 void handleVersion(Peer peer, Message msg) {
     // TODO: check some crap
 
     auto response = new Message(Command.VerAck);
     peer.sendMessage(response);
+}
+
+
+void handleVerAck(Peer peer, Message msg) {
+
 }
 
 
