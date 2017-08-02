@@ -3,28 +3,22 @@ module pool;
 import peer;
 import network;
 
-import core.thread;
-import core.sync.mutex;
-
 import std.stdio;
 import std.datetime;
-import std.socket : TcpSocket, SocketShutdown, InternetAddress;
 
+import vibe.core.log;
 import vibe.core.net;
 
 
 // TODO: remove inactive peers after x mins
 class Pool {
-    private __gshared Peer[]    m_peers;
-    private __gshared TcpSocket m_listener;
-    private shared Networks     m_nets;
-    private shared Mutex        m_peersLock;
+    private Peer[]        m_peers;
+    private TCPListener[] m_listener;
+    private Networks      m_nets;
 
 
-    this(Networks nets, InternetAddress[] addrs = null) {
-        m_nets      = nets;
-        m_peersLock = new shared Mutex;
-        m_listener  = new TcpSocket;
+    this(Networks nets, NetworkAddress[] addrs = null) {
+        m_nets = nets;
 
         if (addrs) {
             m_peers.reserve(addrs.length);
@@ -33,7 +27,7 @@ class Pool {
             }
         }
 
-        new Thread(&_peersChecker).start();
+        //new Thread(&_peersChecker).start();
     }
 
     size_t peerCount() const {
@@ -41,61 +35,43 @@ class Pool {
     }
 
     void connect() {
-        synchronized (m_peersLock) {
-            foreach (x; m_peers) {
-                x.connect();
-            }
+        foreach (x; m_peers) {
+            x.connect();
         }
     }
 
     void disconnect() {
-        synchronized (m_peersLock) {
-            foreach (x; m_peers) {
-                x.disconnect();
-            }
+        foreach (x; m_peers) {
+            //x.disconnect();
         }
 
-        m_listener.shutdown(SocketShutdown.BOTH);
-        m_listener.close();
-        m_listener = null;
+        foreach (x; m_listener) {
+            // TODO: this shit is not supported yet
+            // TODO: x.stopListening();
+        }
     }
 
     void listen() {
         // TODO: port
-        auto addr = new InternetAddress(InternetAddress.ADDR_ANY, 4295);
-        m_listener.bind(addr);
-        m_listener.listen(128);
-
-        new Thread(&_listen).start();
+        m_listener = [listenTCP(4295, &_listen, "0.0.0.0")];
     }
 
 
-    private void _listen() {
-        while (m_listener) {
-            try {
-                auto sock = m_listener.accept();
-                m_peers  ~= new Peer(sock, m_nets);
-
-                writeln("accepted connection");
-            } catch (Exception e) {
-                writeln("warning: ", e.msg);
-                return;
-            }
-        }
+    private void _listen(TCPConnection sock) {
+        m_peers ~= new Peer(sock, m_nets);
+        logInfo("accepted connection");
     }
 
     private void _peersChecker() {
         while (m_peers || m_listener) {
-            Thread.sleep(5.minutes);
+            //Thread.sleep(5.minutes);
 
             try {
-                synchronized (m_peersLock) {
-                    foreach (x; m_peers) {
-                        if (x.lastTime + 5.minutes < Clock.currTime()) {
-                            // TODO : remove peer
-                            // FIX: remove cast
-                            writeln("removing peer ", cast()x);
-                        }
+                foreach (x; m_peers) {
+                    if (x.lastTime + 5.minutes < Clock.currTime()) {
+                        // TODO : remove peer
+                        // FIX: remove cast
+                        writeln("removing peer ", cast()x);
                     }
                 }
 

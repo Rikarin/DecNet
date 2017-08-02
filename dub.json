@@ -8,6 +8,13 @@
 	"license": "proprietary",
 
     "dependencies": {
-        "vibe-d": "~>0.8",
-    }
+        "vibe-d": "~master",
+    },
+
+    "subConfigurations": {
+        "vibe-d": "vibe-core"
+    },
+
+	"versions": ["VibeDefaultMain"]
+
 }

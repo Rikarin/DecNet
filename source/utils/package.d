@@ -8,10 +8,19 @@ T* payload(T, U)(U* data) {
 }
 
 ubyte[] payload(U)(U* data) {
-    return (cast(ubyte *)(cast(ulong)data + U.sizeof))[0 .. data.length];
+    import vibe.core.log;
+    logError("size %s len %s", U.sizeof, data.length);
+    return (cast(ubyte *)data)[U.sizeof .. U.sizeof + data.length];
 }
 
 bool crcCheck(T)(T* data) {
-    return data.checksum == *(cast(int *)sha256Of(sha256Of(data.payload)).ptr);
+    import vibe.core.log;
+    logError("%X %X", data.checksum, data.payload.calculateChecksum);
+    return data.checksum == data.payload.calculateChecksum;
 }
+
+int calculateChecksum(const(ubyte)[] data) {
+    return *(cast(int *)(sha256Of(sha256Of(data)).ptr));
+}
+
 

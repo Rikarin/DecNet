@@ -9,41 +9,48 @@ import private_key;
 
 import std.stdio;
 import std.string;
+import std.datetime;
 
+import core.thread;
+
+import vibe.core.core;
 
 // TODO: -D path/to/dir/with/private_key + cache for my profile
 // TODO: -p listening port, default 4295
-void main() {
-    auto dir = "todo pwd";
 
-    writeln("Welcome to the DecNet!");
-    writeln("Working directory: ", dir);
+shared static this() {
+    runTask({
+        auto dir = "todo pwd";
 
-    auto pool = new Pool(Networks.Live);
-    pool.connect();
-    pool.listen();
+        writeln("Welcome to the DecNet!");
+        writeln("Working directory: ", dir);
 
-    user1();
+        auto pool = new Pool(Networks.Live);
+        pool.connect();
+        pool.listen();
+        Thread.sleep(1.seconds);
 
-    /*string cmd;
-    do {
-        cmd = readln().strip();
+        user1();
 
-        writeln("have :", cmd);
+        /*string cmd;
+        do {
+            cmd = readln().strip();
 
-    } while (cmd != "exit");
+            writeln("have :", cmd);
 
-    */
+        } while (cmd != "exit");
 
-    foreach (x; 0 .. 500000000) { }
-    pool.disconnect();
-    writeln("exiting...");
-    //user1();
+        */
+
+        Thread.sleep(5.seconds);
+        writeln("exiting...");
+        pool.disconnect();
+    });
 }
 
 
 void user1() {
-    auto privateKey = new PrivateKey;
+    /*auto privateKey = new PrivateKey;
     auto address    = privateKey.toPublicKey.toAddress();
 
 
@@ -57,12 +64,17 @@ void user1() {
 
 
     writeln("addr: ", address.toString());
+    */
 
-    auto peer = new Peer("127.0.0.1", 4295, Networks.Live);
-    peer.connect();
-    peer.disconnect();
+    per = new Peer("127.0.0.1", 4295, Networks.Live);
+    Thread.sleep(1.seconds);
+    per.connect();
+
+    Thread.sleep(1.seconds);
+    //peer.disconnect();
 }
 
+Peer per;
 
 void user2() {
 
