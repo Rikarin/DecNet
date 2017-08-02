@@ -8,6 +8,16 @@ enum Networks : ubyte {
 
 
 class Network {
+    enum DefaultPort = 4295;
+}
 
+
+
+class LOL {
+    private static struct Address {
+        align(1):
+
+
+    }
 }
 

@@ -1,8 +1,9 @@
 module server;
 
 import peer;
-import packet;
+//import packet;
 
+/+
 /**
  * I'm server so I'm collecting and distributing profiles
  *
@@ -23,4 +24,4 @@ class Server : Peer {
 
     }
 }
-
++/
