@@ -20,6 +20,9 @@ class Message {
     }
 
 
+    byte[] toArray() const {
+        return null;
+    }
 
     /**
      * Construct Message from data received from socket
