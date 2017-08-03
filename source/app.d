@@ -20,6 +20,7 @@ import vibe.core.task;
 // TODO: -p listening port, default 4295
 
 Pool pol;
+Peer per;
 
 shared static this() {
     runTask({
@@ -47,41 +48,20 @@ shared static this() {
 
         sleep(5.seconds);
         writeln("exiting...");
-        //pool.disconnect();
+        pol.disconnect();
     });
 }
 
 
 void user1() {
-    /*auto privateKey = new PrivateKey;
-    auto address    = privateKey.toPublicKey.toAddress();
-
-
-    auto str = privateKey.toPIF();
-    writeln("len: ", str.length);
-    writeln("test: ", str);
-
-    if (PrivateKey.isValid(str)) {
-        PrivateKey.fromPIF(str);
-    }
-
-
-    writeln("addr: ", address.toString());
-    */
-
     per = new Peer("127.0.0.1", 4295, Networks.Live);
     sleep(1.seconds);
     per.connect();
 
     sleep(1.seconds);
-    //peer.disconnect();
+    //per.disconnect();
 }
 
-Peer per;
-
-void user2() {
-
-}
 
 
 

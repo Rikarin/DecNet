@@ -46,7 +46,6 @@ class Peer {
     this(TCPConnection socket, Networks nets) {
         m_nets    = nets;
         m_socket  = socket;
-
         m_state   = PeerState.Connected;
         m_address = socket.remoteAddress;
 
@@ -58,9 +57,9 @@ class Peer {
     }
 
     void connect() {
-        m_state    = PeerState.Connecting;
-        m_socket   = connectTCP(m_address);
-        m_state    = PeerState.Connected;
+        m_state  = PeerState.Connecting;
+        m_socket = connectTCP(m_address);
+        m_state  = PeerState.Connected;
 
         runTask(&_receive);
         sendVersionMessage();
@@ -74,6 +73,7 @@ class Peer {
 
         m_state = PeerState.Disconnected;
         m_socket.close();
+        m_socket = TCPConnection.init;
     }
 
     void sendMessage(Message message) {
@@ -81,7 +81,6 @@ class Peer {
 
         m_lastTime = Clock.currTime();
         m_socket.write(message.toArray);
-        m_socket = TCPConnection.init;
     }
 
 
@@ -90,7 +89,6 @@ class Peer {
 
         sendMessage(msg);
     }
-
 
     private void _receive() {
         while (m_state == PeerState.Connected) {

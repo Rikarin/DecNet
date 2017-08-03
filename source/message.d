@@ -6,6 +6,7 @@ import utils;
 import vibe.core.log;
 import vibe.core.net;
 
+
 //TODO: nonce??
 
 /**
@@ -27,7 +28,6 @@ class Message {
     this(string cmd) {
         assert(false, "TODO");
     }
-
 
     const(char)[12] command() const {
         return m_header.command;
@@ -70,8 +70,6 @@ class Message {
         return ret;
     }
 
-
-
     static Message versionMessage() {
         auto ret = new Message(Command.Version);
         Version ver = {
@@ -82,10 +80,6 @@ class Message {
 
         return ret;
     }
-
-
-
-
 
 
     // === Protocol
@@ -117,6 +111,14 @@ class Message {
     align(1):
         // TODO
     }
+
+    private static struct Query {
+    align(1):
+        // TODO: flags: full profile, profile, addresses only
+    int count; // max 128 profiles at the same time?
+    // TODO: payload
+        //byte[25] address;
+    }
 }
 
 
@@ -125,15 +127,32 @@ enum Command : ubyte {
     VerAck,
     Ping,
     Pong,
+
+    GetAddress,
+    Address,
+    Query,
+    Data,
 }
 
 private enum char[Message.Header.command.sizeof][Command] ms_cmdTable = [
-    Command.Version : "Version     ",
-    Command.VerAck  : "VerAck      ",
-    Command.Ping    : "Ping        ",
-    Command.Pong    : "Pong        ",
+    Command.Version    : "Version     ",
+    Command.VerAck     : "VerAck      ",
+    Command.Ping       : "Ping        ",
+    Command.Pong       : "Pong        ",
+
+    Command.GetAddress : "GetAddress  ",
+    Command.Address    : "Address     ",
+    Command.Query      : "Query       ",
+    Command.Data       : "Data        ",
 ];
 
+// something like Query command. input is address of user,
+// response should be full profile, part profile, possible addresses
+
+// mohlo by byt toto pouzite na quernutie vsetkych profilov??
+// ci je to zbytocne? zatazovalo by to server? providovalo by to vsetky
+// profily po sieti a mohlo by to byt zneuzite na analyzu dat?
+// analyza dat = cena za poskytovanie sluzieb
 
 
 
@@ -142,8 +161,15 @@ private enum char[Message.Header.command.sizeof][Command] ms_cmdTable = [
 // TODO: use dynamic array/
 alias ParseCallback = void function(Peer, Message);
 private enum ParseCallback[char[12]] ms_parseCallbacks = [
-    ms_cmdTable[Command.Version] : &handleVersion,
-    ms_cmdTable[Command.VerAck]  : &handleVerAck,
+    ms_cmdTable[Command.Version]    : &handleVersion,
+    ms_cmdTable[Command.VerAck]     : &handleVerAck,
+    ms_cmdTable[Command.Ping]       : &handlePing,
+    ms_cmdTable[Command.Pong]       : &handlePong,
+
+    ms_cmdTable[Command.GetAddress] : &handleGetAddress,
+    ms_cmdTable[Command.Address]    : &handleAddress,
+    ms_cmdTable[Command.Query]      : &handleQuery,
+    ms_cmdTable[Command.Data]       : &handleData,
 ];
 
 
@@ -157,7 +183,6 @@ void parseMessage(Peer peer, Message msg) {
     }
 }
 
-
 void handleVersion(Peer peer, Message msg) {
     // TODO: check some crap
 
@@ -165,13 +190,34 @@ void handleVersion(Peer peer, Message msg) {
     peer.sendMessage(response);
 }
 
-
 void handleVerAck(Peer peer, Message msg) {
-
+    // TODO: something
 }
 
+void handlePing(Peer peer, Message msg) {
+    auto response = new Message(Command.Pong);
+    peer.sendMessage(response);
+}
 
+void handlePong(Peer peer, Message msg) {
+    // TODO: reset time?
+}
 
+void handleGetAddress(Peer peer, Message msg) {
+    // return all known peers (servers only)
+}
+
+void handleAddress(Peer peer, Message msg) {
+    // TODO: add peers to pool
+}
+
+void handleQuery(Peer peer, Message msg) {
+    // send Data cmd
+}
+
+void handleData(Peer peer, Message msg) {
+    // add profiles to profile table?
+}
 
 
 
