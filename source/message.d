@@ -1,7 +1,10 @@
 module message;
 
 import peer;
+import pool;
 import utils;
+
+import protocol.ver;
 
 import vibe.core.log;
 import vibe.core.net;
@@ -41,6 +44,10 @@ class Message {
         return (cast(ubyte *)&m_header)[0 .. Header.sizeof] ~ m_data;
     }
 
+    T* payload(T)() {
+        return cast(T *)m_data.ptr;
+    }
+
     void appendData(ubyte[] data) {
         m_data = data.dup;
 
@@ -70,17 +77,6 @@ class Message {
         return ret;
     }
 
-    static Message versionMessage() {
-        auto ret = new Message(Command.Version);
-        Version ver = {
-            ver : 42,
-        };
-
-        ret.appendData((cast(ubyte *)&ver)[0 .. Version.sizeof]);
-
-        return ret;
-    }
-
 
     // === Protocol
     enum HeaderSize = Header.sizeof;
@@ -97,20 +93,6 @@ class Message {
         int      checksum;
     }
 
-    private static struct Version {
-    align(1):
-        int   ver;
-        ulong services;
-        long  timestamp;
-        byte[NetworkAddress.sizeof] toAddr;
-        byte[NetworkAddress.sizeof] fromAddr;
-        // TODO
-    }
-
-    private static struct NetworkAddress {
-    align(1):
-        // TODO
-    }
 
     private static struct Query {
     align(1):
@@ -119,6 +101,11 @@ class Message {
     // TODO: payload
         //byte[25] address;
     }
+}
+
+struct NetAddress {
+align(1):
+    // TODO
 }
 
 
@@ -181,17 +168,6 @@ void parseMessage(Peer peer, Message msg) {
     } else {
         logWarn("unknown command!");
     }
-}
-
-void handleVersion(Peer peer, Message msg) {
-    // TODO: check some crap
-
-    auto response = new Message(Command.VerAck);
-    peer.sendMessage(response);
-}
-
-void handleVerAck(Peer peer, Message msg) {
-    // TODO: something
 }
 
 void handlePing(Peer peer, Message msg) {

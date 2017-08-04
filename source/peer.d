@@ -2,6 +2,7 @@ module peer;
 
 import message;
 import network;
+import protocol.ver;
 
 import vibe.core.core;
 import vibe.core.log;
@@ -85,8 +86,7 @@ class Peer {
 
 
     private void sendVersionMessage() {
-        auto msg = Message.versionMessage;
-
+        auto msg = versionMessage;
         sendMessage(msg);
     }
 
