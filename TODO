@@ -1,0 +1,23 @@
+o Encryption
+    o algorithm for ECDSA pub key computation
+    o sign func
+    o pub-key restoration from sign
+    o should be ECDSA pub key used for content encryption?
+    o should I make another DSA pub key from the same private key as for ECDSA?
+
+
+o Network Discovery Protocol
+    o Version cmd
+    o GetAddress & Address cmds
+
+
+o Protocol
+    o TODO
+
+
+o Data Protocol
+    o Profile storage protocol
+    o private and group messages
+    o threads
+    o responds
+

@@ -5,6 +5,7 @@ import pool;
 import utils;
 
 import protocol.ver;
+import protocol.ping;
 
 import vibe.core.log;
 import vibe.core.net;
@@ -170,14 +171,6 @@ void parseMessage(Peer peer, Message msg) {
     }
 }
 
-void handlePing(Peer peer, Message msg) {
-    auto response = new Message(Command.Pong);
-    peer.sendMessage(response);
-}
-
-void handlePong(Peer peer, Message msg) {
-    // TODO: reset time?
-}
 
 void handleGetAddress(Peer peer, Message msg) {
     // return all known peers (servers only)
@@ -194,7 +187,4 @@ void handleQuery(Peer peer, Message msg) {
 void handleData(Peer peer, Message msg) {
     // add profiles to profile table?
 }
-
-
-
 

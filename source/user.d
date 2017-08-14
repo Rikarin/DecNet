@@ -17,7 +17,7 @@ class Myself : User {
 }
 
 /*
-TODO: date, CRC? (CRC = sha2(sha2(whole message)
+TODO: date, CRC? (CRC = sha2(sha2(whole message))[0 .. 4])
     Message:
     // For everyone
     {

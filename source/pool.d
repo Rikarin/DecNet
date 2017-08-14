@@ -1,33 +1,36 @@
 module pool;
 
 import peer;
+import decnet;
 import network;
 
-import std.stdio;
+import std.array;
 import std.datetime;
+import std.algorithm.searching : canFind;
+import std.algorithm.iteration : filter;
 
 import vibe.core.log;
 import vibe.core.net;
+import vibe.core.core;
 
 
-// TODO: remove inactive peers after x mins
 class Pool {
     private Peer[]        m_peers;
     private TCPListener[] m_listener;
-    private Networks      m_nets;
+    private Networks      m_net;
 
 
-    this(Networks nets, NetworkAddress[] addrs = null) {
-        m_nets = nets;
+    this(Networks net, NetworkAddress[] addrs = null) {
+        m_net = net;
 
         if (addrs) {
             m_peers.reserve(addrs.length);
             foreach (x; addrs) {
-                m_peers ~= new Peer(x, nets);
+                m_peers ~= new Peer(x, net);
             }
         }
 
-        //new Thread(&_peersChecker).start();
+        runTask(&_peersChecker);
     }
 
     size_t peerCount() const {
@@ -42,47 +45,39 @@ class Pool {
 
     void disconnect() {
         foreach (x; m_peers) {
-            //x.disconnect();
+            // TODO: fix this x.disconnect();
         }
 
         foreach (x; m_listener) {
-            // TODO: this shit is not supported yet
             x.stopListening();
         }
     }
 
     void listen() {
-        // TODO: port
-        m_listener = [listenTCP(4295, &_listen, "0.0.0.0")];
+        m_listener = [listenTCP(DecNet.ListenPort, &_listen, "0.0.0.0")];
     }
 
 
     private void _listen(TCPConnection sock) {
-        m_peers ~= new Peer(sock, m_nets);
+        m_peers ~= new Peer(sock, m_net);
         logInfo("accepted connection %s", sock.peerAddress);
     }
 
     private void _peersChecker() {
         while (m_peers || m_listener) {
-            //Thread.sleep(5.minutes);
+            sleep(5.minutes);
 
             try {
-                foreach (x; m_peers) {
-                    if (x.lastTime + 5.minutes < Clock.currTime()) {
-                        // TODO : remove peer
-                        // FIX: remove cast
-                        writeln("removing peer ", cast()x);
-                    }
-                }
-
-                writeln("peers checker");
+                auto ct = Clock.currTime() - 5.minutes;
+                m_peers = m_peers.filter!(x => x.lastTime < ct).array;
+                logInfo("peers checker");
             } catch (Exception e) {
-                writeln("warning: ", e.msg);
+                logInfo("warning: ", e.msg);
                 return;
             }
         }
 
-        writeln("exiting peer checker...");
+        logInfo("exiting peer checker...");
     }
 }
 

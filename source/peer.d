@@ -46,6 +46,7 @@ class Peer {
     }
 
     // TODO: package?
+    // dont call this directly
     this(TCPConnection socket, Networks nets) {
         m_nets    = nets;
         m_socket  = socket;
@@ -53,6 +54,7 @@ class Peer {
         m_address = socket.remoteAddress;
 
         runTask(&_receive);
+        sendMessage(versionMessage);
     }
 
     SysTime lastTime() const {
@@ -69,7 +71,7 @@ class Peer {
         m_state  = PeerState.Connected;
 
         runTask(&_receive);
-        sendVersionMessage();
+        sendMessage(versionMessage);
     }
 
     void disconnect() {
@@ -85,25 +87,22 @@ class Peer {
 
     void sendMessage(Message message) {
         logInfo("Sending message %s", message.command);
-
-        m_lastTime = Clock.currTime();
         m_socket.write(message.toArray);
     }
 
-
-    private void sendVersionMessage() {
-        auto msg = versionMessage;
-        sendMessage(msg);
-    }
 
     private void _receive() {
         while (m_state == PeerState.Connected) {
             ubyte[Message.HeaderSize] header;
 
+            // TODO: any validation of received message?
+            // or should we just disconnect peer when he send us crap?
             try {
                 m_socket.read(header);
-                auto msg  = Message.fromBuffer(header);
-                auto data = new ubyte[msg.length];
+
+                m_lastTime = Clock.currTime();
+                auto msg   = Message.fromBuffer(header);
+                auto data  = new ubyte[msg.length];
 
                 m_socket.read(data);
                 msg.appendData(data);
