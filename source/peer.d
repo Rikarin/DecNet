@@ -21,6 +21,8 @@ class Peer {
     private PeerState      m_state;
     private NetworkAddress m_address;
 
+    private bool m_hasValidVersion;
+
 
     this(string address) {
         this(address, Network.DefaultPort, Networks.Live);
@@ -55,6 +57,10 @@ class Peer {
 
     SysTime lastTime() const {
         return m_lastTime;
+    }
+
+    ref bool hasValidVersion() {
+        return m_hasValidVersion;
     }
 
     void connect() {

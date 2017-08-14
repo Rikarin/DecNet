@@ -1,9 +1,11 @@
 module protocol.ver;
 
 import peer;
-import pool;
 import utils;
+import decnet;
 import message;
+
+import std.datetime;
 
 import vibe.core.log;
 
@@ -22,7 +24,10 @@ align(1):
 Message versionMessage() {
     auto ret = new Message(Command.Version);
     Version ver = {
-        ver : 42,
+        ver       : DecNet.Version,
+        services  : 0b0000000, // TODO
+        timestamp : Clock.currTime().toUnixTime()
+        // TODO
     };
 
     ret.appendData((cast(ubyte *)&ver)[0 .. Version.sizeof]);
@@ -31,7 +36,10 @@ Message versionMessage() {
 
 void handleVersion(Peer peer, Message msg) {
     auto ver = msg.payload!Version();
-    if (ver.ver != Pool.Version) {
+    logDiagnostic("received %s", *ver);
+
+
+    if (ver.ver != DecNet.Version) {
         logWarn("version mismatch");
         // TODO: send refuse?? & disconnect peer
     }
@@ -41,6 +49,7 @@ void handleVersion(Peer peer, Message msg) {
 }
 
 void handleVerAck(Peer peer, Message msg) {
+    peer.hasValidVersion = true;
     // TODO: something
 }
 

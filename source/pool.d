@@ -12,8 +12,6 @@ import vibe.core.net;
 
 // TODO: remove inactive peers after x mins
 class Pool {
-    enum Version = 1;
-
     private Peer[]        m_peers;
     private TCPListener[] m_listener;
     private Networks      m_nets;
