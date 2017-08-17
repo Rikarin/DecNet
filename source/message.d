@@ -6,6 +6,7 @@ import utils;
 
 import protocol.ver;
 import protocol.ping;
+import protocol.advertisement;
 
 import vibe.core.log;
 import vibe.core.net;
@@ -110,10 +111,6 @@ class Message {
     }
 }
 
-struct NetAddress {
-align(1):
-    // TODO
-}
 
 
 enum Command : ubyte {
@@ -172,14 +169,6 @@ void parseMessage(Peer peer, Message msg) {
     }
 }
 
-
-void handleGetAddress(Peer peer, Message msg) {
-    // return all known peers (servers only)
-}
-
-void handleAddress(Peer peer, Message msg) {
-    // TODO: add peers to pool
-}
 
 void handleQuery(Peer peer, Message msg) {
     // send Data cmd

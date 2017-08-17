@@ -10,6 +10,6 @@ void handlePing(Peer peer, Message msg) {
 }
 
 void handlePong(Peer peer, Message msg) {
-    // TODO: reset time?
+    // Time is reset by receiving this message
 }
 

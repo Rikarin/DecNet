@@ -12,6 +12,7 @@ o Network Discovery Protocol
 
 
 o Protocol
+    o Additional data after Header should be send as JSON
     o TODO
 
 
@@ -21,3 +22,7 @@ o Data Protocol
     o threads
     o responds
 
+
+
+o URGENT:
+    o flatbuffers?
