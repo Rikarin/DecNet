@@ -3,6 +3,7 @@ module peer;
 import message;
 import network;
 import protocol.ver;
+import protocol.commands;
 
 import vibe.core.core;
 import vibe.core.log;
@@ -61,6 +62,10 @@ class Peer {
         return m_lastTime;
     }
 
+    const(NetworkAddress) address() const {
+        return m_address;
+    }
+
     ref bool hasValidVersion() {
         return m_hasValidVersion;
     }
@@ -101,6 +106,7 @@ class Peer {
             } catch (Exception e) {
                 m_state = PeerState.Disconnected;
                 logError("Disconnected");
+                logError("%s", e);
                 return;
             }
         }

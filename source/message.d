@@ -3,11 +3,9 @@ module message;
 import peer;
 import pool;
 import utils;
+import protocol.commands;
 
-import protocol.ver;
-import protocol.ping;
-import protocol.query;
-import protocol.advertisement;
+import std.conv;
 
 import vibe.core.log;
 import vibe.core.net;
@@ -15,6 +13,20 @@ import vibe.data.json;
 
 
 //TODO: nonce??
+
+// Implementation in protocol/commands.d
+enum Command : ubyte {
+    Version,
+    VerAck,
+    Ping,
+    Pong,
+
+    GetAddress,
+    Address,
+    Query,
+    Data,
+}
+
 
 /**
  * Sendable container through the network
@@ -28,8 +40,11 @@ class Message {
     }
 
     this(Command cmd) {
-        m_header.magic   = Magic.Value;
-        m_header.command = ms_cmdTable[cmd];
+        string tmp     = cmd.to!string;
+        m_header.magic = Magic.Value;
+
+        m_header.command[] = ' ';
+        m_header.command[0 .. tmp.length] = tmp[];
     }
 
     this(char[12] cmd) {
@@ -92,7 +107,7 @@ class Message {
     }
 
 
-    // === Protocol
+    // ===
     private enum Magic {
         Value = 0x2A83F542
     }
@@ -103,57 +118,6 @@ class Message {
         char[12] command;
         int      length;
         int      checksum;
-    }
-}
-
-
-enum Command : ubyte {
-    Version,
-    VerAck,
-    Ping,
-    Pong,
-
-    GetAddress,
-    Address,
-    Query,
-    Data,
-}
-
-private enum char[Message.Header.command.sizeof][Command] ms_cmdTable = [
-    Command.Version    : "Version     ",
-    Command.VerAck     : "VerAck      ",
-    Command.Ping       : "Ping        ",
-    Command.Pong       : "Pong        ",
-
-    Command.GetAddress : "GetAddress  ",
-    Command.Address    : "Address     ",
-    Command.Query      : "Query       ",
-    Command.Data       : "Data        ",
-];
-
-
-// TODO: move this to another file?
-// TODO: use dynamic array/
-alias ParseCallback = void function(Peer, Message);
-private enum ParseCallback[char[12]] ms_parseCallbacks = [
-    ms_cmdTable[Command.Version]    : &handleVersion,
-    ms_cmdTable[Command.VerAck]     : &handleVerAck,
-    ms_cmdTable[Command.Ping]       : &handlePing,
-    ms_cmdTable[Command.Pong]       : &handlePong,
-
-    ms_cmdTable[Command.GetAddress] : &handleGetAddress,
-    ms_cmdTable[Command.Address]    : &handleAddress,
-    ms_cmdTable[Command.Query]      : &handleQuery,
-    ms_cmdTable[Command.Data]       : &handleData,
-];
-
-void parseMessage(Peer peer, Message msg) {
-    logInfo("parsing command %s", msg.command);
-
-    if (auto x = msg.command in ms_parseCallbacks) {
-        (*x)(peer, msg);
-    } else {
-        logWarn("unknown command!");
     }
 }
 

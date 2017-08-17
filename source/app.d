@@ -1,5 +1,6 @@
 module app;
 
+import decnet;
 import peer;
 import pool;
 import address;
@@ -19,7 +20,6 @@ import vibe.core.task;
 // TODO: -D path/to/dir/with/private_key + cache for my profile
 // TODO: -p listening port, default 4295
 
-Pool pol;
 Peer per;
 
 shared static this() {
@@ -29,9 +29,8 @@ shared static this() {
         writeln("Welcome to the DecNet!");
         writeln("Working directory: ", dir);
 
-        pol = new Pool(Networks.Live);
-        pol.connect();
-        pol.listen();
+        DecNet.LivePool.connect();
+        DecNet.LivePool.listen();
         sleep(1.seconds);
 
         user1();
@@ -48,7 +47,7 @@ shared static this() {
 
         sleep(5.seconds);
         writeln("exiting...");
-        pol.disconnect();
+        DecNet.LivePool.disconnect();
     });
 }
 
@@ -58,7 +57,12 @@ void user1() {
     sleep(1.seconds);
     per.connect();
 
+
+    import message;
+    auto msg = new Message(Command.Query);
+
     sleep(1.seconds);
+    per.sendMessage(msg);
     //per.disconnect();
 }
 

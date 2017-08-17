@@ -12,7 +12,6 @@ class Network {
 }
 
 
-
 struct NetAddress {
 align(1):
     long      timestamp;
