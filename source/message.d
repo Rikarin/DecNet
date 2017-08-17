@@ -6,10 +6,12 @@ import utils;
 
 import protocol.ver;
 import protocol.ping;
+import protocol.query;
 import protocol.advertisement;
 
 import vibe.core.log;
 import vibe.core.net;
+import vibe.data.json;
 
 
 //TODO: nonce??
@@ -30,8 +32,8 @@ class Message {
         m_header.command = ms_cmdTable[cmd];
     }
 
-    this(string cmd) {
-        assert(false, "TODO");
+    this(char[12] cmd) {
+        m_header.command = cmd;
     }
 
     const(char)[12] command() const {
@@ -42,22 +44,24 @@ class Message {
         return m_header.length;
     }
 
+    T payload(T)() {
+        return deserializeJson!T(cast(string)m_payload);
+    }
+
+    void payload(T)(T payload) {
+        auto pl = payload.serializeToJsonString();
+
+        m_payload         = cast(ubyte[])pl;
+        m_header.length   = cast(int)m_payload.length;
+        m_header.checksum = m_payload.calculateChecksum;
+    }
+
+
+    // === Conversion
     const(ubyte)[] toArray() const {
         return (cast(ubyte *)&m_header)[0 .. Header.sizeof] ~ m_payload;
     }
 
-    T* payload(T)() {
-        return cast(T *)m_payload.ptr;
-    }
-
-    void appendData(ubyte[] data) {
-        m_payload         = data.dup;
-        m_header.length   = cast(int)data.length;
-        m_header.checksum = data.calculateChecksum;
-    }
-
-
-    // === Creates Message from Buffer or Stream
     static Message fromBuffer(const(ubyte)[] data) {
         assert(false, "TODO");
         // TODO: this should create whole msg at once
@@ -100,17 +104,7 @@ class Message {
         int      length;
         int      checksum;
     }
-
-
-    private static struct Query {
-    align(1):
-        // TODO: flags: full profile, profile, addresses only
-    int count; // max 128 profiles at the same time?
-    // TODO: payload
-        //byte[25] address;
-    }
 }
-
 
 
 enum Command : ubyte {
@@ -137,11 +131,6 @@ private enum char[Message.Header.command.sizeof][Command] ms_cmdTable = [
     Command.Data       : "Data        ",
 ];
 
-// something like Query command. input is address of user,
-// response should be full profile, part profile, possible addresses
-
-
-
 
 // TODO: move this to another file?
 // TODO: use dynamic array/
@@ -158,7 +147,6 @@ private enum ParseCallback[char[12]] ms_parseCallbacks = [
     ms_cmdTable[Command.Data]       : &handleData,
 ];
 
-
 void parseMessage(Peer peer, Message msg) {
     logInfo("parsing command %s", msg.command);
 
@@ -167,14 +155,5 @@ void parseMessage(Peer peer, Message msg) {
     } else {
         logWarn("unknown command!");
     }
-}
-
-
-void handleQuery(Peer peer, Message msg) {
-    // send Data cmd
-}
-
-void handleData(Peer peer, Message msg) {
-    // add profiles to profile table?
 }
 

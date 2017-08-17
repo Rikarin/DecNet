@@ -19,7 +19,7 @@ align(1):
     NetAddress toAddr;
     NetAddress fromAddr;
     ulong      nonce; // reserved for future usage
-    // user agent?
+    string     userAgent;
 }
 
 
@@ -29,17 +29,19 @@ Message versionMessage() {
         ver       : DecNet.Version,
         services  : 0b0000000, // TODO
         timestamp : Clock.currTime().toUnixTime(),
-
-        // TODO
+        toAddr    : NetAddress.init, // TODO
+        fromAddr  : NetAddress.init, // TODO
+        nonce     : 0, // TODO
+        userAgent : "client:official"
     };
 
-    ret.appendData((cast(ubyte *)&ver)[0 .. Version.sizeof]);
+    ret.payload = ver;
     return ret;
 }
 
 void handleVersion(Peer peer, Message msg) {
     auto ver = msg.payload!Version();
-    logDiagnostic("received %s", *ver);
+    logDiagnostic("received %s", ver);
 
     if (ver.ver != DecNet.Version) {
         logWarn("version mismatch");
