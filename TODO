@@ -26,5 +26,4 @@ o Data Protocol
 o saving and restoration of pool.servers?
 o how to remove from pool.servers?
 o diff between live & test?
-o add live & test global var to pool?
 

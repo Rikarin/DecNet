@@ -1,7 +1,6 @@
 module decnet;
 
 import pool;
-import network;
 
 
 class DecNet {
@@ -14,16 +13,24 @@ class DecNet {
 
     // set by -p argument
     static __gshared ushort ListenPort = 4295;
-
-    // default live pool
-    static __gshared Pool LivePool;
-
-    shared static this() {
-        LivePool = new Pool(Networks.Live);
-    }
-
-    shared static ~this() {
-        //LivePool.disconnect();
-    }
 }
 
+
+
+import vibe.core.net;
+import vibe.data.json;
+import std.file;
+
+// Save all server connections to file
+void saveToFile(Pool pool, string filename) {
+    auto tmp = pool.servers.serializeToJsonString();
+    filename.write(tmp);
+}
+
+// Restore all server connections from file
+void loadFromFile(Pool pool, string filename) {
+    auto tmp = filename.readText;
+
+    auto peers = tmp.deserializeJson!(NetworkAddress[])();
+    assert(false, "TODO");
+}

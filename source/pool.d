@@ -15,11 +15,22 @@ import vibe.core.core;
 
 
 class Pool {
+    static __gshared Pool Live;
+    static __gshared Pool Test;
+
     private Networks         m_net;
     private Peer[]           m_peers;
     private TCPListener[]    m_listener;
     private NetworkAddress[] m_servers;
 
+
+    shared static this() {
+        version (TestNetwork) {
+            Test = new Pool(Networks.Test);
+        } else {
+            Live = new Pool(Networks.Live);
+        }
+    }
 
     this(Networks net, NetworkAddress[] servers = null) {
         m_net = net;

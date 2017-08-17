@@ -29,8 +29,8 @@ shared static this() {
         writeln("Welcome to the DecNet!");
         writeln("Working directory: ", dir);
 
-        DecNet.LivePool.connect();
-        DecNet.LivePool.listen();
+        Pool.Live.connect();
+        Pool.Live.listen();
         sleep(1.seconds);
 
         user1();
@@ -47,7 +47,7 @@ shared static this() {
 
         sleep(5.seconds);
         writeln("exiting...");
-        DecNet.LivePool.disconnect();
+        Pool.Live.disconnect();
     });
 }
 

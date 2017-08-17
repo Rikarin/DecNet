@@ -1,7 +1,7 @@
 module protocol.advertisement;
 
 import peer;
-import decnet;
+import pool;
 import message;
 import network;
 
@@ -14,7 +14,7 @@ import vibe.core.log;
 void handleGetAddress(Peer peer, Message msg) {
     NetAddress[] addrs;
 
-    foreach (x; DecNet.LivePool.servers) {
+    foreach (x; Pool.Live.servers) {
         ubyte[16] full;
 
         auto ad      = x.sockAddrInet4.sin_addr.s_addr;
@@ -46,3 +46,4 @@ void handleAddress(Peer peer, Message msg) {
 
     logError("got %s", data);
 }
+
