@@ -33,6 +33,10 @@ class Pool {
         runTask(&_peersChecker);
     }
 
+    Peer[] peers() {
+        return m_peers;
+    }
+
     size_t peerCount() const {
         return m_peers.length;
     }
@@ -65,7 +69,7 @@ class Pool {
 
     private void _peersChecker() {
         while (m_peers || m_listener) {
-            sleep(5.minutes);
+            sleep(3.hours);
 
             try {
                 auto ct = Clock.currTime() - 5.minutes;

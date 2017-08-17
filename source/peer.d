@@ -93,21 +93,11 @@ class Peer {
 
     private void _receive() {
         while (m_state == PeerState.Connected) {
-            ubyte[Message.HeaderSize] header;
-
-            // TODO: any validation of received message?
-            // or should we just disconnect peer when he send us crap?
             try {
-                m_socket.read(header);
-
-                m_lastTime = Clock.currTime();
-                auto msg   = Message.fromBuffer(header);
-                auto data  = new ubyte[msg.length];
-
-                m_socket.read(data);
-                msg.appendData(data);
-
-                parseMessage(this, msg);
+                if (auto msg = Message.fromStream(m_socket)) {
+                    m_lastTime = Clock.currTime();
+                    parseMessage(this, msg);
+                }
             } catch (Exception e) {
                 m_state = PeerState.Disconnected;
                 logError("Disconnected");

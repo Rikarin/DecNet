@@ -17,6 +17,7 @@ align(1):
     long  timestamp;
     byte[NetAddress.sizeof] toAddr;
     byte[NetAddress.sizeof] fromAddr;
+    ulong nonce;
     // TODO
 }
 

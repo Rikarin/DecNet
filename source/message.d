@@ -18,14 +18,14 @@ import vibe.core.net;
  */
 class Message {
     private Header  m_header;
-    private ubyte[] m_data;
+    private ubyte[] m_payload;
 
     private this() {
 
     }
 
     this(Command cmd) {
-        m_header.magic   = Magic.Default;
+        m_header.magic   = Magic.Value;
         m_header.command = ms_cmdTable[cmd];
     }
 
@@ -42,37 +42,45 @@ class Message {
     }
 
     const(ubyte)[] toArray() const {
-        return (cast(ubyte *)&m_header)[0 .. Header.sizeof] ~ m_data;
+        return (cast(ubyte *)&m_header)[0 .. Header.sizeof] ~ m_payload;
     }
 
     T* payload(T)() {
-        return cast(T *)m_data.ptr;
+        return cast(T *)m_payload.ptr;
     }
 
     void appendData(ubyte[] data) {
-        m_data = data.dup;
-
-        if (m_header.length) {
-            if (m_header.checksum != m_data.calculateChecksum) {
-                logError("wrong checksup");
-                // TODO: throw?
-            }
-        } else {
-            m_header.length   = cast(int)m_data.length;
-            m_header.checksum = m_data.calculateChecksum;
-        }
+        m_payload         = data.dup;
+        m_header.length   = cast(int)data.length;
+        m_header.checksum = data.calculateChecksum;
     }
 
 
-    /**
-     * Construct Message from data received from socket
-     */
+    // === Creates Message from Buffer or Stream
     static Message fromBuffer(const(ubyte)[] data) {
-        auto ret     = new Message;
-        ret.m_header = *cast(Header *)data.ptr;
+        assert(false, "TODO");
+        // TODO: this should create whole msg at once
+    }
 
-        if (ret.m_header.magic != Magic.Default) {
-            logWarn("Magic mismatch");
+    static Message fromStream(TCPConnection stream) {
+        auto ret = new Message;
+
+        // Read and validate Header
+        stream.read((cast(ubyte *)&ret.m_header)[0 .. Header.sizeof]);
+        if (ret.m_header.magic != Magic.Value) {
+            logWarn("magic mismatch");
+            return null;
+        }
+
+        // Read additional data and validate
+        if (ret.m_header.length) {
+            ret.m_payload = new ubyte[ret.m_header.length];
+            stream.read(ret.m_payload);
+
+            if (ret.m_header.checksum != ret.m_payload.calculateChecksum) {
+                logError("wrong checksum");
+                return null;
+            }
         }
 
         return ret;
@@ -80,10 +88,8 @@ class Message {
 
 
     // === Protocol
-    enum HeaderSize = Header.sizeof;
-
-    private enum Magic : uint {
-        Default = 0xDEADC0DE
+    private enum Magic {
+        Value = 0x2A83F542
     }
 
     private static struct Header {
@@ -136,11 +142,6 @@ private enum char[Message.Header.command.sizeof][Command] ms_cmdTable = [
 
 // something like Query command. input is address of user,
 // response should be full profile, part profile, possible addresses
-
-// mohlo by byt toto pouzite na quernutie vsetkych profilov??
-// ci je to zbytocne? zatazovalo by to server? providovalo by to vsetky
-// profily po sieti a mohlo by to byt zneuzite na analyzu dat?
-// analyza dat = cena za poskytovanie sluzieb
 
 
 
