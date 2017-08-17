@@ -69,6 +69,8 @@ class Message {
         m_payload         = cast(ubyte[])pl;
         m_header.length   = cast(int)m_payload.length;
         m_header.checksum = m_payload.calculateChecksum;
+
+        logError("payload %s", cast(string)m_payload);
     }
 
 

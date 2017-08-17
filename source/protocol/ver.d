@@ -28,7 +28,7 @@ Message versionMessage() {
     Version ver = {
         ver       : DecNet.Version,
         services  : 0b0000000, // TODO
-        timestamp : Clock.currTime().toUnixTime(),
+        timestamp : Clock.currTime.toUnixTime,
         toAddr    : NetAddress.init, // TODO
         fromAddr  : NetAddress.init, // TODO
         nonce     : 0, // TODO

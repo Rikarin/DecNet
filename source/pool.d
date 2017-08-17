@@ -15,17 +15,19 @@ import vibe.core.core;
 
 
 class Pool {
-    private Peer[]        m_peers;
-    private TCPListener[] m_listener;
-    private Networks      m_net;
+    private Networks         m_net;
+    private Peer[]           m_peers;
+    private TCPListener[]    m_listener;
+    private NetworkAddress[] m_servers;
 
 
-    this(Networks net, NetworkAddress[] addrs = null) {
+    this(Networks net, NetworkAddress[] servers = null) {
         m_net = net;
 
-        if (addrs) {
-            m_peers.reserve(addrs.length);
-            foreach (x; addrs) {
+        if (servers) {
+            m_servers = servers;
+            m_peers.reserve(servers.length);
+            foreach (x; servers) {
                 m_peers ~= new Peer(x, net);
             }
         }
@@ -37,8 +39,21 @@ class Pool {
         return m_peers;
     }
 
+    NetworkAddress[] servers() {
+        return m_servers;
+    }
+
     size_t peerCount() const {
         return m_peers.length;
+    }
+
+    void add(Peer peer) {
+        // TODO: check if not exist
+        m_peers ~= peer;
+    }
+
+    void remove(Peer peer) {
+        m_peers = m_peers.filter!(x => x != peer).array;
     }
 
     void connect() {

@@ -59,7 +59,7 @@ void user1() {
 
 
     import message;
-    auto msg = new Message(Command.Query);
+    auto msg = new Message(Command.GetAddress);
 
     sleep(1.seconds);
     per.sendMessage(msg);
