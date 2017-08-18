@@ -86,6 +86,7 @@ class Peer {
     }
 
     void connect() {
+        scope (failure) m_state = PeerState.Disconnected;
         m_state  = PeerState.Connecting;
         m_socket = connectTCP(m_address);
         m_state  = PeerState.Connected;

@@ -70,7 +70,11 @@ class Pool {
 
     void connect() {
         foreach (x; m_peers) {
-            x.connect();
+            try {
+                x.connect();
+            } catch (Exception e) {
+                logError("Cannot connect to peer %s. Skipping...", x.address.toString);
+            }
         }
     }
 
