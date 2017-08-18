@@ -53,12 +53,8 @@ void user1() {
     auto per = new Peer("127.0.0.1", 4295, Networks.Live);
     Pool.Live.add(per);
 
-    import vibe.core.log;
-    logError("per's pool %s", per.pool);
-
     sleep(1.seconds);
     per.connect();
-
 
     import message;
     auto msg = new Message(Command.GetAddress);

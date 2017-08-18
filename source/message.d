@@ -6,6 +6,7 @@ import utils;
 import protocol.commands;
 
 import std.conv;
+import std.zlib;
 
 import vibe.core.log;
 import vibe.core.net;
@@ -60,17 +61,16 @@ class Message {
     }
 
     T payload(T)() {
-        return deserializeJson!T(cast(string)m_payload);
+        return deserializeJson!T(cast(string)m_payload.uncompress);
     }
 
     void payload(T)(T payload) {
         auto pl = payload.serializeToJsonString();
+        logDiagnostic("payload %s", m_payload);
 
-        m_payload         = cast(ubyte[])pl;
+        m_payload         = pl.compress;
         m_header.length   = cast(int)m_payload.length;
         m_header.checksum = m_payload.calculateChecksum;
-
-        logDiagnostic("payload %s", cast(string)m_payload);
     }
 
 
