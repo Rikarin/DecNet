@@ -18,10 +18,9 @@ class Pool {
     static __gshared Pool Live;
     static __gshared Pool Test;
 
-    private Networks         m_net;
-    private Peer[]           m_peers;
-    private TCPListener[]    m_listener;
-    private NetworkAddress[] m_servers;
+    private Networks      m_net;
+    private Peer[]        m_peers;
+    private TCPListener[] m_listener;
 
 
     shared static this() {
@@ -32,14 +31,14 @@ class Pool {
         }
     }
 
-    this(Networks net, NetworkAddress[] servers = null) {
+    this(Networks net, NetworkAddress[] addrs = null) {
         m_net = net;
 
-        if (servers) {
-            m_servers = servers;
-            m_peers.reserve(servers.length);
-            foreach (x; servers) {
+        if (addrs) {
+            m_peers.reserve(addrs.length);
+            foreach (x; addrs) {
                 m_peers ~= new Peer(x, net);
+                m_peers[$ - 1].isServer = true;
             }
         }
 
@@ -48,10 +47,6 @@ class Pool {
 
     Peer[] peers() {
         return m_peers;
-    }
-
-    NetworkAddress[] servers() {
-        return m_servers;
     }
 
     size_t peerCount() const {

@@ -14,17 +14,21 @@ import vibe.core.log;
 void handleGetAddress(Peer peer, Message msg) {
     NetAddress[] addrs;
 
-    foreach (x; Pool.Live.servers) {
-        ubyte[16] full;
+    foreach (x; Pool.Live.peers) {
+        if (!x.isServer) {
+            continue;
+        }
 
-        auto ad      = x.sockAddrInet4.sin_addr.s_addr;
+        ubyte[16] full;
+        auto a       = x.address;
+        auto ad      = a.sockAddrInet4.sin_addr.s_addr;
         full[0 .. 4] = nativeToLittleEndian!uint(ad);
 
         NetAddress tmp = {
             timestamp : Clock.currTime.toUnixTime, // TODO: is this ok?
             services  : 0, // TODO
             address   : full,
-            port      : x.port
+            port      : a.port
         };
 
         addrs ~= tmp;

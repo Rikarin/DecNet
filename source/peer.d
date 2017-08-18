@@ -23,6 +23,7 @@ class Peer {
     private NetworkAddress m_address;
 
     private bool m_hasValidVersion;
+    private bool m_isServer;
 
 
     this(string address) {
@@ -56,6 +57,10 @@ class Peer {
 
         runTask(&_receive);
         sendMessage(versionMessage);
+    }
+
+    ref bool isServer() {
+        return m_isServer;
     }
 
     SysTime lastTime() const {

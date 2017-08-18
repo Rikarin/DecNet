@@ -17,13 +17,23 @@ class DecNet {
 
 
 
+
+
+// TODO: this is saving & restoration of pool's server
 import vibe.core.net;
 import vibe.data.json;
 import std.file;
 
 // Save all server connections to file
 void saveToFile(Pool pool, string filename) {
-    auto tmp = pool.servers.serializeToJsonString();
+    NetworkAddress[] servers;
+    foreach (x; pool.peers) {
+        if (x.isServer) {
+            servers ~= x.address;
+        }
+    }
+
+    auto tmp = servers.serializeToJsonString();
     filename.write(tmp);
 }
 
@@ -32,5 +42,8 @@ void loadFromFile(Pool pool, string filename) {
     auto tmp = filename.readText;
 
     auto peers = tmp.deserializeJson!(NetworkAddress[])();
-    assert(false, "TODO");
+    foreach (x; peers) {
+        // add servers
+    }
 }
+
