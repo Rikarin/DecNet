@@ -58,13 +58,25 @@ class Pool {
     }
 
     void add(Peer peer) {
-        // TODO: check if not exist
-        m_peers ~= peer;
+        foreach (ref x; m_peers) {
+            if (x is peer) {
+                if (x.state == PeerState.Disconnected) {
+                    x = peer;
+                    return;
+                }
+
+                logWarn("Peer already connected!");
+                // TODO: throw?
+                return;
+            }
+        }
+
+        m_peers  ~= peer;
         peer.pool = this;
     }
 
     void remove(Peer peer) {
-        m_peers = m_peers.filter!(x => x != peer).array;
+        m_peers   = m_peers.filter!(x => x != peer).array;
         peer.pool = null;
     }
 

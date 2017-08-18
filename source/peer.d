@@ -81,6 +81,10 @@ class Peer {
         return m_address;
     }
 
+    PeerState state() const {
+        return m_state;
+    }
+
     ref bool hasValidVersion() {
         return m_hasValidVersion;
     }
@@ -121,6 +125,7 @@ class Peer {
                 }
             } catch (Exception e) {
                 m_state = PeerState.Disconnected;
+                // TODO: notify about our state? pool.remove(this);
                 logError("Disconnected");
                 logError("%s", e);
                 return;
