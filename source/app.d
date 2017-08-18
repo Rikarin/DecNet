@@ -20,40 +20,42 @@ import vibe.core.task;
 // TODO: -D path/to/dir/with/private_key + cache for my profile
 // TODO: -p listening port, default 4295
 
-Peer per;
-
 shared static this() {
     runTask({
         auto dir = "todo pwd";
-
         writeln("Welcome to the DecNet!");
         writeln("Working directory: ", dir);
 
-        Pool.Live.connect();
-        Pool.Live.listen();
-        sleep(1.seconds);
-
-        user1();
-
-        /*string cmd;
-        do {
-            cmd = readln().strip();
-
-            writeln("have :", cmd);
-
-        } while (cmd != "exit");
-
-        */
-
-        sleep(5.seconds);
-        writeln("exiting...");
-        Pool.Live.disconnect();
+        liveServer();
+        test();
     });
 }
 
+void liveServer() {
+    Pool.Live.connect();
+    Pool.Live.listen();
+}
+
+
+
+
+void test() {
+    sleep(1.seconds);
+
+    user1();
+
+    sleep(5.seconds);
+    writeln("exiting...");
+    Pool.Live.disconnect();
+}
 
 void user1() {
-    per = new Peer("127.0.0.1", 4295, Networks.Live);
+    auto per = new Peer("127.0.0.1", 4295, Networks.Live);
+    Pool.Live.add(per);
+
+    import vibe.core.log;
+    logError("per's pool %s", per.pool);
+
     sleep(1.seconds);
     per.connect();
 
@@ -68,6 +70,15 @@ void user1() {
 
 
 
+        /*string cmd;
+        do {
+            cmd = readln().strip();
+
+            writeln("have :", cmd);
+
+        } while (cmd != "exit");
+
+        */
 
 void user(string[] cmd) {
     if (!cmd.length) {

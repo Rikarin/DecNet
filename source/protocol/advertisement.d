@@ -14,7 +14,7 @@ import vibe.core.log;
 void handleGetAddress(Peer peer, Message msg) {
     NetAddress[] addrs;
 
-    foreach (x; Pool.Live.peers) {
+    foreach (x;peer.pool.peers) {
         if (!x.isServer) {
             continue;
         }
@@ -43,6 +43,7 @@ void handleAddress(Peer peer, Message msg) {
     auto data = msg.payload!(NetAddress[]);
 
     foreach (x; data) {
+        // if x is not in peer.pool.peers
         // TODO
         //auto peer = new Peer(x.address, x.port);
         //pool.add(peer);

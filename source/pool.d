@@ -27,7 +27,10 @@ class Pool {
         version (TestNetwork) {
             Test = new Pool(Networks.Test);
         } else {
-            Live = new Pool(Networks.Live);
+            auto rikarin = resolveHost("rikarin.org");
+            rikarin.port = 4295;
+
+            Live = new Pool(Networks.Live, [rikarin]);
         }
     }
 
@@ -39,6 +42,7 @@ class Pool {
             foreach (x; addrs) {
                 m_peers ~= new Peer(x, net);
                 m_peers[$ - 1].isServer = true;
+                m_peers[$ - 1].pool     = this;
             }
         }
 
@@ -56,10 +60,12 @@ class Pool {
     void add(Peer peer) {
         // TODO: check if not exist
         m_peers ~= peer;
+        peer.pool = this;
     }
 
     void remove(Peer peer) {
         m_peers = m_peers.filter!(x => x != peer).array;
+        peer.pool = null;
     }
 
     void connect() {
@@ -84,7 +90,10 @@ class Pool {
 
 
     private void _listen(TCPConnection sock) {
-        m_peers ~= new Peer(sock, m_net);
+        auto peer = new Peer(sock, m_net);
+        peer.pool = this;
+        m_peers  ~= peer;
+
         logInfo("accepted connection %s", sock.peerAddress);
     }
 

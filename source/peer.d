@@ -1,5 +1,6 @@
 module peer;
 
+import pool;
 import message;
 import network;
 import protocol.ver;
@@ -16,6 +17,7 @@ import std.datetime;
  * This class provides connection to enemy peer (client or server)
  */
 class Peer {
+    private Pool           m_pool;
     private TCPConnection  m_socket;
     private Networks       m_nets;
     private SysTime        m_lastTime;
@@ -57,6 +59,14 @@ class Peer {
 
         runTask(&_receive);
         sendMessage(versionMessage);
+    }
+
+    Pool pool() {
+        return m_pool;
+    }
+
+    void pool(Pool value) {
+        m_pool = value;
     }
 
     ref bool isServer() {

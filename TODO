@@ -9,6 +9,7 @@ o Encryption
 o Network Discovery Protocol
     o Version cmd
     o GetAddress & Address cmds
+    o when to ask for new addresses?
 
 
 o Protocol
