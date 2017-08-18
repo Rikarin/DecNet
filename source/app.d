@@ -60,21 +60,18 @@ void user1() {
     auto msg = new Message(Command.GetAddress);
 
     sleep(1.seconds);
-    per.sendMessage(msg);
+    per.send(msg);
     //per.disconnect();
 }
+    /*string cmd;
+    do {
+        cmd = readln().strip();
 
+        writeln("have :", cmd);
 
+    } while (cmd != "exit");
 
-        /*string cmd;
-        do {
-            cmd = readln().strip();
-
-            writeln("have :", cmd);
-
-        } while (cmd != "exit");
-
-        */
+    */
 
 void user(string[] cmd) {
     if (!cmd.length) {

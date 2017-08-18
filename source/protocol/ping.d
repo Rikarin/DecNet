@@ -5,8 +5,7 @@ import message;
 
 
 void handlePing(Peer peer, Message msg) {
-    auto response = new Message(Command.Pong);
-    peer.sendMessage(response);
+    peer.send(new Message(Command.Pong));
 }
 
 void handlePong(Peer peer, Message msg) {

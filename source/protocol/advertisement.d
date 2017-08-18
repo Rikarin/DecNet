@@ -34,9 +34,10 @@ void handleGetAddress(Peer peer, Message msg) {
         addrs ~= tmp;
     }
 
-    auto reply = new Message(Command.Address);
-    reply.payload(addrs);
-    peer.sendMessage(reply);
+    auto reply    = new Message(Command.Address);
+    reply.payload = addrs;
+
+    peer.send(reply);
 }
 
 void handleAddress(Peer peer, Message msg) {

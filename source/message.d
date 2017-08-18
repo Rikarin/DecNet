@@ -66,7 +66,7 @@ class Message {
 
     void payload(T)(T payload) {
         auto pl = payload.serializeToJsonString();
-        logDiagnostic("payload %s", m_payload);
+        logDiagnostic("payload %s", pl);
 
         m_payload         = pl.compress;
         m_header.length   = cast(int)m_payload.length;

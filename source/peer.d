@@ -18,10 +18,10 @@ import std.datetime;
  */
 class Peer {
     private Pool           m_pool;
-    private TCPConnection  m_socket;
-    private Networks       m_nets;
     private SysTime        m_lastTime;
+    private Networks       m_nets;
     private PeerState      m_state;
+    private TCPConnection  m_socket;
     private NetworkAddress m_address;
 
     private bool m_hasValidVersion;
@@ -58,7 +58,7 @@ class Peer {
         m_address = socket.remoteAddress;
 
         runTask(&_receive);
-        sendMessage(versionMessage);
+        send(versionMessage);
     }
 
     Pool pool() {
@@ -96,7 +96,7 @@ class Peer {
         m_state  = PeerState.Connected;
 
         runTask(&_receive);
-        sendMessage(versionMessage);
+        send(versionMessage);
     }
 
     void disconnect() {
@@ -110,7 +110,7 @@ class Peer {
         m_socket = TCPConnection.init;
     }
 
-    void sendMessage(Message message) {
+    void send(Message message) {
         logInfo("Sending message %s", message.command);
         m_socket.write(message.toArray);
     }

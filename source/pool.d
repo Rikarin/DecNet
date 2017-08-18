@@ -2,6 +2,7 @@ module pool;
 
 import peer;
 import decnet;
+import message;
 import network;
 
 import std.array;
@@ -102,6 +103,17 @@ class Pool {
 
     void listen() {
         m_listener = [listenTCP(DecNet.ListenPort, &_listen, "0.0.0.0")];
+    }
+
+    void send(Message message) {
+        foreach (x; m_peers) {
+            try {
+                x.send(message);
+            } catch (Exception e) {
+                logError("Something wents wrong");
+                logError("%s", e);
+            }
+        }
     }
 
 

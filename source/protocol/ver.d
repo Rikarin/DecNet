@@ -49,8 +49,7 @@ void handleVersion(Peer peer, Message msg) {
         peer.disconnect();
     }
 
-    auto response = new Message(Command.VerAck);
-    peer.sendMessage(response);
+    peer.send(new Message(Command.VerAck));
 }
 
 void handleVerAck(Peer peer, Message msg) {
