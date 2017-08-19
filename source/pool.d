@@ -66,9 +66,8 @@ class Pool {
                     return;
                 }
 
-                logWarn("Peer already connected!");
-                // TODO: throw?
-                return;
+                // Maybe don't throw?
+                throw new Exception("peer already connected");
             }
         }
 

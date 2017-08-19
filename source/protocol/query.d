@@ -4,8 +4,8 @@ import peer;
 import address;
 import message;
 import network;
+import profile;
 
-import public_key;
 import vibe.core.log;
 import vibe.data.json;
 
@@ -14,27 +14,58 @@ import vibe.data.json;
 // response should be full profile, part profile, possible addresses
 
 enum QueryType {
-    None      = 0 << 0,
-    Addresses = 1 << 0,
-    Profile   = 1 << 1,
-    Full      = 1 << 2,
-}
+    None    = 0 << 0,
+    Address = 1 << 0,
+    Profile = 1 << 1,
 
-struct Profile { // TODO: move this
-    int foo;
-    int bar;
-    NetAddress[] addresses;
+    Full    = Address | Profile
 }
 
 struct Query {
 align(1):
     QueryType flags;
-    ubyte     count;
-    Address[] profileAddresses;
+    Address[] address;
+}
+
+struct Data {
+align(1):
+    Address      address;
+    Profile      profile;
+    NetAddress[] netAddr;
+}
+
+
+void queryProfile(Address[] address, QueryType type) {
+    Query query = {
+        flags   : type,
+        address : address
+    };
 }
 
 void handleQuery(Peer peer, Message msg) {
-    // send Data cmd
+    auto query = msg.payload!Query;
+    Data[] data;
+
+    bool qp = (query.flags & QueryType.Profile) == QueryType.Profile;
+    bool qa = (query.flags & QueryType.Address) == QueryType.Address;
+
+    foreach (x; query.address) {
+        auto p = lookupProfile(x);
+        if (p == ProfileList.init) {
+            continue;
+        }
+
+        Data tmp = {
+            address : x,
+            profile : qp ? p.profile : null,
+            netAddr : qa ? p.netAddr : null
+        };
+    }
+
+    auto reply    = new Message(Command.Data);
+    reply.payload = data;
+
+    peer.send(reply);
 }
 
 void handleData(Peer peer, Message msg) {

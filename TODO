@@ -13,7 +13,6 @@ o Network Discovery Protocol
 
 
 o Protocol
-    o Additional data after Header should be send as JSON
     o TODO
 
 
