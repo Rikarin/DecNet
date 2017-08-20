@@ -35,6 +35,17 @@ class Address {
     }
 
 
+
+    // ===
+    override bool opEquals(Object other) const {
+        if (auto x = cast(Address)other) {
+            return m_data == x.m_data;
+        }
+
+        return false;
+    }
+
+
     // === Conversions
     override string toString() const {
         return Base58.encode(m_data);
@@ -42,8 +53,13 @@ class Address {
 
 
     static Address fromString(string address) {
+        // TODO: validate(address);
         auto ret   = new Address;
-        ret.m_data = Base58.decode(address);
+        //ret.m_data = Base58.decode(address);
+
+        // TODO: hack for testing purpouse
+        auto a = Base58.decode(address);
+        ret.m_data[0 .. a.length] = a[];
 
         return ret;
     }

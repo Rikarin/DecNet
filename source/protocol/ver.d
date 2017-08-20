@@ -12,7 +12,6 @@ import vibe.core.log;
 
 
 struct Version {
-align(1):
     int        ver;
     ulong      services;
     long       timestamp;

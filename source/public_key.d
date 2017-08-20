@@ -38,5 +38,11 @@ class PublicKey {
     override string toString() const {
         return m_data.toHex(); // TODO: check this
     }
+
+
+    static PublicKey fromString(string value) {
+        validate(value);
+        return new PublicKey(value);
+    }
 }
 

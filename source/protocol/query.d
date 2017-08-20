@@ -22,29 +22,27 @@ enum QueryType {
 }
 
 struct Query {
-align(1):
     QueryType flags;
     Address[] address;
 }
 
-struct Data {
-align(1):
-    Address      address;
-    Profile      profile;
-    NetAddress[] netAddr;
-}
 
-
-void queryProfile(Address[] address, QueryType type) {
+Message queryMessage(Address[] address, QueryType type = QueryType.Full) {
     Query query = {
         flags   : type,
         address : address
     };
+
+    auto msg    = new Message(Command.Query);
+    msg.payload = query;
+
+    return msg;
 }
 
 void handleQuery(Peer peer, Message msg) {
     auto query = msg.payload!Query;
-    Data[] data;
+    ProfileList[] data;
+    logError("1 got %s", query);
 
     bool qp = (query.flags & QueryType.Profile) == QueryType.Profile;
     bool qa = (query.flags & QueryType.Address) == QueryType.Address;
@@ -55,11 +53,15 @@ void handleQuery(Peer peer, Message msg) {
             continue;
         }
 
-        Data tmp = {
-            address : x,
-            profile : qp ? p.profile : null,
-            netAddr : qa ? p.netAddr : null
-        };
+        if (!qp) {
+            p.profile = null;
+        }
+
+        if (!qa) {
+            p.netAddr = null;
+        }
+
+        data ~= p;
     }
 
     auto reply    = new Message(Command.Data);
@@ -69,6 +71,9 @@ void handleQuery(Peer peer, Message msg) {
 }
 
 void handleData(Peer peer, Message msg) {
-    // add profiles to profile table?
+    auto payload = msg.payload!(ProfileList[]);
+    logError("got %s", payload);
+
+    // TODO add profiles to profile table?
 }
 

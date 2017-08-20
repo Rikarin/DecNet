@@ -8,8 +8,11 @@ import std.algorithm.iteration;
 
 
 class Profile {
+    private int pyco;
+
+
     Address address() {
-        assert(false, "TODO");
+        return Address.fromString("ABCD");
     }
 }
 
@@ -24,7 +27,7 @@ struct ProfileList {
 
 ProfileList lookupProfile(Address address) {
     // look in table, files, mybe ask another node?
-    auto res = Profiles.filter!(x => x.profile.address is address).array;
+    auto res = Profiles.filter!(x => x.profile.address == address).array;
 
     return res ? res[0] : ProfileList.init;
 }

@@ -61,6 +61,14 @@ void user1() {
 
     sleep(1.seconds);
     per.send(msg);
+
+
+    import profile;
+    Profiles ~= ProfileList(new Profile);
+
+    sleep(1.seconds);
+    import protocol.query;
+    per.send(queryMessage([Address.fromString("ABCD")]));
     //per.disconnect();
 }
     /*string cmd;
